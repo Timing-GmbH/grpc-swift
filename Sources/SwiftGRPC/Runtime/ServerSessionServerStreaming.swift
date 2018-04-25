@@ -42,7 +42,7 @@ open class ServerSessionServerStreamingBase<InputType: Message, OutputType: Mess
             let requestMessage = try InputType(serializedData: requestData)
             try self.providerBlock(requestMessage, self)
           } catch {
-            responseStatus = (error as? ServerStatus) ?? .processingError
+            responseStatus = (error as? ServerStatus) ?? ServerStatus(code: .internalError, message: "server error: " + String(reflecting: error))
           }
         } else {
           print("ServerSessionServerStreamingBase.run empty request data")

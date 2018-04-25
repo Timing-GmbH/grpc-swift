@@ -48,7 +48,7 @@ open class ServerSessionClientStreamingBase<InputType: Message, OutputType: Mess
           do {
             try self.providerBlock(self)
           } catch {
-            responseStatus = (error as? ServerStatus) ?? .processingError
+            responseStatus = (error as? ServerStatus) ?? ServerStatus(code: .internalError, message: "server error: " + String(reflecting: error))
           }
         } else {
           print("ServerSessionClientStreamingBase.run sending initial metadata failed")

@@ -42,7 +42,7 @@ open class ServerSessionBidirectionalStreamingBase<InputType: Message, OutputTyp
           do {
             try self.providerBlock(self)
           } catch {
-            responseStatus = (error as? ServerStatus) ?? .processingError
+            responseStatus = (error as? ServerStatus) ?? ServerStatus(code: .internalError, message: "server error: " + String(reflecting: error))
           }
         } else {
           print("ServerSessionBidirectionalStreamingBase.run sending initial metadata failed")

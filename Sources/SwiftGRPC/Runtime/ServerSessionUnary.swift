@@ -46,7 +46,7 @@ open class ServerSessionUnaryBase<InputType: Message, OutputType: Message>: Serv
             }
             responseStatus = .ok
           } catch {
-            responseStatus = (error as? ServerStatus) ?? .processingError
+            responseStatus = (error as? ServerStatus) ?? ServerStatus(code: .internalError, message: "server error: " + String(reflecting: error))
           }
         } else {
           print("ServerSessionUnaryBase.run empty request data")
