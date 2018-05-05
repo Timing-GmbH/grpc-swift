@@ -36,7 +36,7 @@ open class ServerSessionBidirectionalStreamingBase<InputType: Message, OutputTyp
   
   public func run(queue: DispatchQueue) throws {
     try handler.sendMetadata(initialMetadata: initialMetadata) { success in
-      queue.async {
+      queue.async(flags: .detached) {
         var responseStatus: ServerStatus?
         if success {
           do {

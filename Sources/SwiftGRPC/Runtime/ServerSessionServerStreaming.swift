@@ -35,7 +35,7 @@ open class ServerSessionServerStreamingBase<InputType: Message, OutputType: Mess
   
   public func run(queue: DispatchQueue) throws {
     try handler.receiveMessage(initialMetadata: initialMetadata) { requestData in
-      queue.async {
+      queue.async(flags: .detached) {
         var responseStatus: ServerStatus?
         if let requestData = requestData {
           do {

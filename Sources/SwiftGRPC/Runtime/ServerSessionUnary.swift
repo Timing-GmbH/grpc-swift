@@ -35,7 +35,7 @@ open class ServerSessionUnaryBase<InputType: Message, OutputType: Message>: Serv
     print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServerSessionUnary\(ObjectIdentifier(self)).run start"); fflush(stdout)
     try handler.receiveMessage(initialMetadata: initialMetadata) { requestData in
       print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServerSessionUnary\(ObjectIdentifier(self)).run received initial metadata, dispatching async"); fflush(stdout)
-      queue.async {
+      queue.async(flags: .detached) {
         print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServerSessionUnary\(ObjectIdentifier(self)).run entered async"); fflush(stdout)
         let responseStatus: ServerStatus
         if let requestData = requestData {
