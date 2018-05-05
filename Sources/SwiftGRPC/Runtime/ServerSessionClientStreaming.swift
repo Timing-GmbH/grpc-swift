@@ -42,7 +42,8 @@ open class ServerSessionClientStreamingBase<InputType: Message, OutputType: Mess
   
   public func run(queue: DispatchQueue) throws {
     try handler.sendMetadata(initialMetadata: initialMetadata) { success in
-      queue.async(flags: .detached) {
+      let handlerThreadQueue = DispatchQueue(label: "SwiftGRPC.ServerSessionClientStreamingBase.run.handlerThread")
+      handlerThreadQueue.async {
         var responseStatus: ServerStatus?
         if success {
           do {
