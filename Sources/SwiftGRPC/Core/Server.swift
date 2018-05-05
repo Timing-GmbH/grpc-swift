@@ -66,14 +66,20 @@ public class Server {
                   handlerFunction: @escaping (Handler) -> Void) {
     cgrpc_server_start(underlyingServer)
     // run the server on a new background thread
+    print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run dispatching async"); fflush(stdout)
     dispatchQueue.async {
+      print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run spinloop start"); fflush(stdout)
       spinloop: while true {
         do {
+          print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run requesting handler"); fflush(stdout)
           let handler = Handler(underlyingServer: self.underlyingServer)
+          print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run requesting call"); fflush(stdout)
           try handler.requestCall(tag: Server.handlerCallTag)
+          print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run received call, waiting for event"); fflush(stdout)
 
           // block while waiting for an incoming request
           let event = self.completionQueue.wait(timeout: 600)
+          print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run received event"); fflush(stdout)
 
           if event.type == .complete {
             if event.tag == Server.handlerCallTag {
@@ -91,7 +97,9 @@ public class Server {
                     strongHandlerReference = nil
                   }
                 }
+                print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run dispatching async handler"); fflush(stdout)
                 dispatchQueue.async {
+                  print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run entering async handler"); fflush(stdout)
                   // dispatch the handler function on a separate thread
                   handlerFunction(handler)
                 }
@@ -105,11 +113,14 @@ public class Server {
           } else if event.type == .queueShutdown {
             break spinloop
           }
+          
+          print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run dispatched event"); fflush(stdout)
         } catch {
           print("server call error: \(error)")
           break spinloop
         }
       }
+      print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer\(ObjectIdentifier(self)).run spinloop done"); fflush(stdout)
       self.onCompletion?()
     }
   }

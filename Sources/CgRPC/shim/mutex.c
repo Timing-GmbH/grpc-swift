@@ -15,6 +15,7 @@
  */
 #include "internal.h"
 #include "cgrpc.h"
+#include <stdio.h>
 
 cgrpc_mutex *cgrpc_mutex_create() {
   cgrpc_mutex *mu = (cgrpc_mutex *) malloc(sizeof(cgrpc_mutex));
@@ -28,9 +29,11 @@ void cgrpc_mutex_destroy(cgrpc_mutex *mu) {
 }
 
 void cgrpc_mutex_lock(cgrpc_mutex *mu) {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_mutex_lock %p", mu);
   gpr_mu_lock(mu);
 }
 
 void cgrpc_mutex_unlock(cgrpc_mutex *mu) {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_mutex_lock %p", mu);
   gpr_mu_unlock(mu);
 }

@@ -19,8 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 cgrpc_operations *cgrpc_operations_create() {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_operations_create");
   return (cgrpc_operations *) malloc(sizeof (cgrpc_operations));
 }
 

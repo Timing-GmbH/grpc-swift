@@ -18,11 +18,13 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "internal.h"
 #include "cgrpc.h"
 
 cgrpc_metadata_array *cgrpc_metadata_array_create() {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_metadata_array_create");
   cgrpc_metadata_array *metadata = (cgrpc_metadata_array *) gpr_malloc(sizeof(cgrpc_metadata_array));
   grpc_metadata_array_init(metadata);
   return metadata;
@@ -72,6 +74,7 @@ void cgrpc_metadata_array_move_metadata(cgrpc_metadata_array *destination,
 }
 
 cgrpc_metadata_array *cgrpc_metadata_array_copy(cgrpc_metadata_array *src) {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_metadata_array_copy");
   cgrpc_metadata_array *dst = cgrpc_metadata_array_create();
   if (src->count > 0) {
     dst->capacity = src->count;

@@ -18,6 +18,17 @@
 #endif
 import Foundation // for String.Encoding
 
+public extension DateFormatter {
+  static let zulu: DateFormatter = {
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.calendar = Calendar(identifier: .iso8601)
+    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+    return dateFormatter
+  }()
+}
+
 public final class gRPC {
   private init() { }  // Static members only.
   

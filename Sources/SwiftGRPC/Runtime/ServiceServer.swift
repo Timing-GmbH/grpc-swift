@@ -55,6 +55,7 @@ open class ServiceServer {
   /// Start the server.
   public func start(queue: DispatchQueue = DispatchQueue.global()) {
     server.run { [weak self] handler in
+      print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer.run handler"); fflush(stdout)
       guard let strongSelf = self else {
         print("ERROR: ServiceServer has been asked to handle a request even though it has already been deallocated")
         return
@@ -71,6 +72,7 @@ open class ServiceServer {
       }
       
       do {
+        print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer.run handleMethod start"); fflush(stdout)
         if !(try strongSelf.handleMethod(unwrappedMethod, handler: handler, queue: queue)) {
           do {
             try handler.call.perform(OperationGroup(
@@ -89,6 +91,7 @@ open class ServiceServer {
       } catch {
         print("Server error: \(error)")
       }
+      print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "ServiceServer.run handleMethod done"); fflush(stdout)
     }
   }
 }

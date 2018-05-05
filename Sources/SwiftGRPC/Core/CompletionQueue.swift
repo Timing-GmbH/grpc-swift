@@ -92,6 +92,8 @@ class CompletionQueue {
   /// - Parameter timeout: a timeout value in seconds
   /// - Returns: a grpc_completion_type code indicating the result of waiting
   func wait(timeout: TimeInterval) -> CompletionQueueEvent {
+    print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).wait start"); fflush(stdout)
+    defer { print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).wait done"); fflush(stdout) }
     let event = cgrpc_completion_queue_get_next_event(underlyingCompletionQueue, timeout)
     return CompletionQueueEvent(event)
   }
@@ -112,10 +114,14 @@ class CompletionQueue {
   ///
   /// - Parameter completion: a completion handler that is called when the queue stops running
   func runToCompletion(completion: (() -> Void)?) {
+    print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion start, dispatching async"); fflush(stdout)
     // run the completion queue on a new background thread
     DispatchQueue.global().async {
+      print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion entered async block"); fflush(stdout)
       spinloop: while true {
+        print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion wait"); fflush(stdout)
         let event = cgrpc_completion_queue_get_next_event(self.underlyingCompletionQueue, 600)
+        print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion received event"); fflush(stdout)
         switch event.type {
         case GRPC_OP_COMPLETE:
           let tag = Int(bitPattern:cgrpc_event_tag(event))
@@ -130,7 +136,7 @@ class CompletionQueue {
               self.operationGroups[tag] = nil
             }
           } else {
-            print("CompletionQueue.runToCompletion error: operation group with tag \(tag) not found")
+            print("CompletionQueue\(ObjectIdentifier(self)).runToCompletion error: operation group with tag \(tag) not found")
           }
         case GRPC_QUEUE_SHUTDOWN:
           self.operationGroupsMutex.lock()
@@ -146,11 +152,13 @@ class CompletionQueue {
         case GRPC_QUEUE_TIMEOUT:
           continue spinloop
         default:
-          print("CompletionQueue.runToCompletion error: unknown event type \(event.type)")
+          print("CompletionQueue\(ObjectIdentifier(self)).runToCompletion error: unknown event type \(event.type)")
           break spinloop
         }
+        print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion inner loop done"); fflush(stdout)
       }
       // when the queue stops running, call the queue completion handler
+      print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion done"); fflush(stdout)
       completion?()
     }
   }

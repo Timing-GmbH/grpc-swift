@@ -22,6 +22,7 @@
 void *cgrpc_create_tag(void *t) { return t; }
 
 gpr_timespec cgrpc_deadline_in_seconds_from_now(float seconds) {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_deadline_in_seconds_from_now %f", seconds);
   return gpr_time_add(gpr_now(GPR_CLOCK_MONOTONIC),
                       gpr_time_from_millis((int64_t)(1e3 * seconds), GPR_TIMESPAN));
 }

@@ -61,6 +61,7 @@ char *cgrpc_handler_call_peer(cgrpc_handler *h) {
 }
 
 cgrpc_call *cgrpc_handler_get_call(cgrpc_handler *h) {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_handler_get_call start");
   cgrpc_call *call = (cgrpc_call *) malloc(sizeof(cgrpc_call));
   memset(call, 0, sizeof(cgrpc_call));
   call->call = h->server_call;
@@ -78,16 +79,19 @@ cgrpc_completion_queue *cgrpc_handler_get_completion_queue(cgrpc_handler *h) {
 grpc_call_error cgrpc_handler_request_call(cgrpc_handler *h,
                                            cgrpc_metadata_array *metadata,
                                            void *tag) {
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_handler_request_call start");
   if (h->server_call != NULL) {
     return GRPC_CALL_OK;
   }
   // This fills `h->server_call` with a call with retain count of +1.
   // We'll release that retain in `cgrpc_handler_destroy()`.
-  return grpc_server_request_call(h->server->server,
+  grpc_call_error result = grpc_server_request_call(h->server->server,
                                   &(h->server_call),
                                   &(h->call_details),
                                   metadata,
                                   h->completion_queue,
                                   h->server->completion_queue,
                                   cgrpc_create_tag(tag));
+  gpr_log(GPR_DEBUG, "[SWIFTGRPC] cgrpc_handler_request_call done");
+  return result;
 }
