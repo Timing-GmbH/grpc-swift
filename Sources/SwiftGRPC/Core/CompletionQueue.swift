@@ -116,7 +116,8 @@ class CompletionQueue {
   func runToCompletion(completion: (() -> Void)?) {
     print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion start, dispatching async"); fflush(stdout)
     // run the completion queue on a new background thread
-    DispatchQueue.global().async(flags: .detached) {
+    let spinloopThreadQueue = DispatchQueue(label: "SwiftGRPC.CompletionQueue.runToCompletion.spinloopThread")
+    spinloopThreadQueue.async {
       print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion entered async block"); fflush(stdout)
       spinloop: while true {
         print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "CompletionQueue\(ObjectIdentifier(self)).runToCompletion wait"); fflush(stdout)

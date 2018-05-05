@@ -67,7 +67,9 @@ public class Server {
     cgrpc_server_start(underlyingServer)
     // run the server on a new background thread
     print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "Server\(ObjectIdentifier(self)).run dispatching async"); fflush(stdout)
-    dispatchQueue.async {
+    let spinloopThreadQueue = DispatchQueue(label: "SwiftGRPC.CompletionQueue.runToCompletion.spinloopThread")
+    let handlerDispatchQueue = DispatchQueue(label: "SwiftGRPC.Server.run.dispatchHandler", attributes: .concurrent)
+    spinloopThreadQueue.async {
       print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "Server\(ObjectIdentifier(self)).run spinloop start"); fflush(stdout)
       spinloop: while true {
         do {
@@ -92,13 +94,13 @@ public class Server {
                 _ = strongHandlerReference
                 // this will start the completion queue on a new thread
                 handler.completionQueue.runToCompletion {
-                  dispatchQueue.async {
+                  handlerDispatchQueue.async {
                     // release the handler when it finishes
                     strongHandlerReference = nil
                   }
                 }
                 print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "Server\(ObjectIdentifier(self)).run dispatching async handler"); fflush(stdout)
-                dispatchQueue.async(flags: .detached) {
+                handlerDispatchQueue.async {
                   print(DateFormatter.zulu.string(from: Date()), "[SWIFTGRPC-SWIFT]", "Server\(ObjectIdentifier(self)).run entering async handler"); fflush(stdout)
                   // dispatch the handler function on a separate thread
                   handlerFunction(handler)
