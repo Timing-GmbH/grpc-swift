@@ -69,7 +69,10 @@ let package = Package(
               "NIOHTTP2",
               "SwiftProtobuf"]),
     .target(name: "CgRPC",
-            dependencies: cGRPCDependencies),
+            dependencies: cGRPCDependencies,
+              exclude: [
+                  "include",
+              ]),
     .target(name: "RootsEncoder"),
     .target(name: "protoc-gen-swiftgrpc",
             dependencies: [
