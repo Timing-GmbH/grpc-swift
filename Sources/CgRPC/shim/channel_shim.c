@@ -70,7 +70,7 @@ cgrpc_channel *cgrpc_channel_create_google(const char *address,
   channel_args.args = args;
   channel_args.num_args = num_args;
 
-  grpc_channel_credentials *google_creds = grpc_google_default_credentials_create();
+  grpc_channel_credentials *google_creds = grpc_google_default_credentials_create(NULL);
 
   c->channel = grpc_secure_channel_create(google_creds, address, &channel_args, NULL);
   grpc_channel_credentials_release(google_creds);
