@@ -166,6 +166,14 @@ extension HTTP1ToRawGRPCServerCodec: ChannelInboundHandler {
   }
 }
 
+extension CharacterSet {
+  public static let grpcStatusMessageAllowed: CharacterSet = {
+    var result = CharacterSet(charactersIn: UnicodeScalar(0x20)...UnicodeScalar(0x24))
+    result.insert(charactersIn: UnicodeScalar(0x26)...UnicodeScalar(0x7E))
+    return result
+  }()
+}
+
 extension HTTP1ToRawGRPCServerCodec: ChannelOutboundHandler {
   public typealias OutboundIn = RawGRPCServerResponsePart
   public typealias OutboundOut = HTTPServerResponsePart
@@ -230,7 +238,7 @@ extension HTTP1ToRawGRPCServerCodec: ChannelOutboundHandler {
 
       var trailers = status.trailingMetadata
       trailers.add(name: "grpc-status", value: String(describing: status.code.rawValue))
-      if let message = status.message {
+      if let message = status.message?.addingPercentEncoding(withAllowedCharacters: .grpcStatusMessageAllowed) {
         trailers.add(name: "grpc-message", value: message)
       }
 
