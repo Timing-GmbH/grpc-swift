@@ -129,7 +129,7 @@ public final class Server: @unchecked Sendable {
       bootstrap
       // Enable `SO_REUSEADDR` to avoid "address already in use" error.
       .serverChannelOption(
-        ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR),
+        ChannelOptions.socketOption(.so_reuseaddr),
         value: 1
       )
       // Set the handlers that are applied to the accepted Channels
@@ -142,9 +142,9 @@ public final class Server: @unchecked Sendable {
       }
 
       // Enable TCP_NODELAY and SO_REUSEADDR for the accepted Channels
-      .childChannelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+      .childChannelOption(ChannelOptions.tcpOption(.tcp_nodelay), value: 1)
       .childChannelOption(
-        ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR),
+        ChannelOptions.socketOption(.so_reuseaddr),
         value: 1
       )
   }

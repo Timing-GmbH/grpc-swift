@@ -56,7 +56,7 @@ enum Zlib {
       // From the documentation:
       //   Note that it is possible for the compressed size to be larger than the value returned
       //   by deflateBound() if flush options other than Z_FINISH or Z_NO_FLUSH are used.
-      let upperBound = CGRPCZlib_deflateBound(&self.stream.zstream, UInt(input.readableBytes))
+      let upperBound = CGRPCZlib_deflateBound(&self.stream.zstream, uLong(input.readableBytes))
 
       return try input.readWithUnsafeMutableReadableBytes { inputPointer -> (Int, Int) in
 

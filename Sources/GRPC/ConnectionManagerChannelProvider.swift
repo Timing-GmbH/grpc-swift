@@ -236,8 +236,8 @@ internal struct DefaultChannelProvider: ConnectionManagerChannelProvider {
 
     bootstrap =
       bootstrap
-      .channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
-      .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+      .channelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+      .channelOption(ChannelOptions.tcpOption(.tcp_nodelay), value: 1)
       .channelInitializer { channel in
         let sync = channel.pipeline.syncOperations
 

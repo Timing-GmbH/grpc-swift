@@ -28,9 +28,35 @@ let cgrpcZlibTargetName = cgrpcZlibProductName
 let includeNIOSSL = ProcessInfo.processInfo.environment["GRPC_NO_NIO_SSL"] == nil
 let defaultSwiftSettings: [SwiftSetting] = [.swiftLanguageMode(.v5)]
 
+// MARK: - Windows (Timing fork, branch `windows-port`)
+//
+// `CGRPCZlib` links `-lz`, and Windows has no system zlib and no pkg-config to find one. Timing
+// already vendors `the-swift-collective/zlib` as a sibling checkout (ZIPFoundation's Windows fork
+// uses the same one), so depend on that instead.
+//
+// The guard is `#if os(Windows)` on the *host running SwiftPM*, not a `.when(platforms:)`
+// condition, because the dependency itself must not exist off Windows: a `.product(package: "zlib")`
+// reference to an undeclared package is a manifest error even when its platform condition is false.
+// On macOS every one of these is empty, so the manifest evaluates to exactly upstream's.
+#if os(Windows)
+let windowsOnlyPackageDependencies: [Package.Dependency] = [
+  .package(path: "../zlib")
+]
+let cgrpcZlibPlatformDependencies: [Target.Dependency] = [
+  .product(name: "ZLibC", package: "zlib")
+]
+let cgrpcZlibLinkerSettings: [LinkerSetting] = []
+#else
+let windowsOnlyPackageDependencies: [Package.Dependency] = []
+let cgrpcZlibPlatformDependencies: [Target.Dependency] = []
+let cgrpcZlibLinkerSettings: [LinkerSetting] = [
+  .linkedLibrary("z")
+]
+#endif
+
 // MARK: - Package Dependencies
 
-let packageDependencies: [Package.Dependency] = [
+let packageDependencies: [Package.Dependency] = windowsOnlyPackageDependencies + [
   .package(
     url: "https://github.com/apple/swift-nio.git",
     from: "2.65.0"
@@ -174,11 +200,10 @@ extension Target {
   static var cgrpcZlib: Target {
     .target(
       name: cgrpcZlibTargetName,
+      dependencies: cgrpcZlibPlatformDependencies,
       path: "Sources/CGRPCZlib",
       swiftSettings: defaultSwiftSettings,
-      linkerSettings: [
-        .linkedLibrary("z"),
-      ]
+      linkerSettings: cgrpcZlibLinkerSettings
     )
   }
 

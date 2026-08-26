@@ -21,6 +21,9 @@ import NIOHTTP2
 import NIOPosix
 import NIOTLS
 import NIOTransportServices
+#if canImport(WinSDK)
+import WinSDK
+#endif
 import SwiftProtobuf
 
 #if os(Linux)
